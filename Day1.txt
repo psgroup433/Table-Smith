@@ -1,0 +1,5 @@
+First Day
+-> Downloaded Datasets
+-> Clearly Understood the Problem Statement
+-> Started Learning LLM
+  -> Revisiting PyTorch
