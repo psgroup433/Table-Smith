@@ -1,0 +1,5 @@
+ShipTypeID,ShipMode
+1,Land
+2,Water
+3,Air
+4,Land and Air

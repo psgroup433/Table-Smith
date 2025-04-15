@@ -1,0 +1,11 @@
+CityId,CityName,CountryId
+1,London,1
+2,Manchester,1
+3,New York,2
+4,Los Angeles,2
+5,Chicago,2
+6,Mumbai,3
+7,Delhi,3
+8,Rio de Janeiro,4
+9,Cape Town,6
+10,Beijing,5

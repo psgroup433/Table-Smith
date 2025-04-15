@@ -1,0 +1,13 @@
+ProjectID,ClientID,Scale,Level,Start Date
+P1,C1,Low,Normal,2024-11-02
+P2,C2,Mid,Normal,2024-11-17
+P3,C1,High,Urgent,2024-07-11
+P4,C5,Low,Urgent,2024-10-05
+P5,C1,Mid,Urgent,2024-11-08
+P6,C1,High,Urgent,2025-01-03
+P7,C1,Low,Normal,2024-08-21
+P8,C1,Mid,Normal,2024-04-22
+P9,C4,High,Urgent,2024-02-19
+P10,C3,Low,Urgent,2024-03-10
+P11,C3,Mid,Normal,2024-05-06
+P12,C4,High,Normal,2025-01-09

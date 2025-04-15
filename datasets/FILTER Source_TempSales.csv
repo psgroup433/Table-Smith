@@ -1,0 +1,11 @@
+CityId,CityName,CountryId,TotalSales,Number of Purchases,Unnamed: 5,Unnamed: 6,Unnamed: 7
+1,London,1,33.17,2,,,
+2,Manchester,1,38.58,2,,,
+3,New York,2,54.38,2,,,
+4,Los Angeles,2,4.5,0,,,
+5,Chicago,2,7.4,1,,,
+6,Mumbai,3,34.5,2,,,Don’t' load this sheet
+7,Delhi,3,,0,,,
+8,Rio de Janeiro,4,14.0,1,,,
+9,Cape Town,6,16.2,1,,,
+10,Beijing,5,35.59,2,,,
