@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>LLM Data Processor</title>
+  <style>
+    /* --- General Body and Font Styling --- */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      background-color: #f8f9fa; /* Light grey background */
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* --- Header Styling --- */
+    header {
+      background-color: #ffffff;
+      padding: 1.5rem 3rem;
+      border-bottom: 1px solid #dee2e6;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: #343a40;
+    }
+
+    /* --- Main Content Layout --- */
+    .main-container {
+      display: flex;
+      flex: 1;
+      padding: 3rem;
+      gap: 3rem;
+      flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    }
+
+    .content-area {
+      flex: 2; /* Takes up 2/3 of the space */
+      min-width: 300px; /* Minimum width to prevent squishing */
+      background: #ffffff;
+      padding: 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      display: flex; /* Use flexbox for internal layout */
+      flex-direction: column;
+    }
+
+    .sidebar {
+      flex: 1; /* Takes up 1/3 of the space */
+      min-width: 250px; /* Minimum width */
+      background-color: #e9ecef; /* A slightly darker grey for contrast */
+      padding: 2.5rem;
+      border-radius: 12px;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      color: #0056b3;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 0.5rem;
+      margin-top: 0;
+    }
+
+    h3 {
+        font-size: 1.2rem;
+        color: #0056b3;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+    }
+
+
+    p, li {
+      line-height: 1.6;
+      color: #555;
+    }
+
+    /* --- Form and Input Styling --- */
+    .file-input {
+      margin-bottom: 2rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      color: #495057;
+    }
+
+    input[type=file] {
+      width: calc(100% - 24px); /* Adjust for padding */
+      padding: 12px;
+      border: 2px dashed #ced4da;
+      border-radius: 8px;
+      background-color: #f8f9fa;
+      cursor: pointer;
+      transition: border-color 0.3s, background-color 0.3s;
+    }
+
+    input[type=file]::file-selector-button {
+        display: none; /* Hide the default button */
+    }
+
+    input[type=file]:hover {
+        border-color: #007bff;
+        background-color: #e2e6ea;
+    }
+
+    input[type=submit] {
+      width: 100%;
+      background: linear-gradient(45deg, #007bff, #0056b3);
+      color: white;
+      padding: 15px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: bold;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    input[type=submit]:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+    }
+
+    input[type=submit]:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* --- Flash Message Styling --- */
+    .flash {
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border-radius: 8px;
+      font-weight: 500;
+      border: 1px solid transparent;
+      display: none; /* Hidden by default */
+      word-break: break-word; /* Prevent long text from overflowing */
+    }
+
+    .flash.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border-color: #f5c6cb;
+      display: block;
+    }
+
+    .flash.info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border-color: #bee5eb;
+      display: block;
+    }
+
+     .flash.warning {
+      background-color: #fff3cd;
+      color: #856404;
+      border-color: #ffeeba;
+      display: block;
+    }
+
+
+    /* --- Results Area Styling --- */
+    #results-area {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid #dee2e6;
+    }
+
+    #column-analysis-details {
+        max-height: 300px; /* Limit height */
+        overflow-y: auto; /* Add scroll if content overflows */
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        font-size: 0.9em;
+        white-space: pre-wrap; /* Preserve line breaks from analysis */
+    }
+
+    #transformed-data-table {
+        margin-top: 1rem;
+        width: 100%; /* Make table responsive to container */
+        overflow-x: auto; /* Add horizontal scroll for wide tables */
+    }
+
+    #transformed-data-table table {
+        width: 100%;
+        border-collapse: collapse; /* Remove space between borders */
+    }
+
+    #transformed-data-table th,
+    #transformed-data-table td {
+        border: 1px solid #dee2e6;
+        padding: 8px;
+        text-align: left;
+    }
+
+    #transformed-data-table th {
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+    }
+
+    #transformed-data-table tbody tr:nth-child(even) {
+        background-color: #f2f2f2; /* Stripe rows */
+    }
+
+    #transformed-data-table tbody tr:hover {
+        background-color: #e9ecef; /* Hover effect */
+    }
+
+     /* --- Footer Styling (Optional) --- */
+     footer {
+       text-align: center;
+       padding: 1.5rem;
+       color: #6c757d;
+       font-size: 0.9em;
+       margin-top: auto; /* Push footer to bottom */
+     }
+
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Table-Smith</h1>
+  </header>
+
+  <div class="main-container">
+    <div class="content-area">
+      <h2>Upload Your Data</h2>
+      <p>Select two related CSV or JSON files for processing. The system will analyze the primary file using Granite, generate cleaning code with Gemini, apply it, and then merge the transformed primary file with the secondary file.</p>
+
+      <!-- Container for JS-driven flash messages -->
+      <div id="flash-container"></div>
+
+      <!-- Removed action/method, added id for JS targeting -->
+      <form id="upload-form" enctype="multipart/form-data">
+        <div class="file-input">
+          <label for="primary_file">File 1 (Primary)</label>
+          <input type="file" name="primary_file" id="primary_file" accept=".csv,.json" required>
+        </div>
+        <div class="file-input">
+          <label for="secondary_file">File 2 (Secondary)</label>
+          <input type="file" name="secondary_file" id="secondary_file" accept=".csv,.json" required>
+        </div>
+        <input type="submit" id="submit-button" value="Analyze and Transform Data">
+      </form>
+
+      <!-- Results Area -->
+      <div id="results-area" style="display: none;">
+          <h3>Processing Results</h3>
+          <div id="analysis-output">
+              <h4>Column Analysis Details (Primary File)</h4>
+              <pre id="column-analysis-details">Analysis will appear here...</pre>
+          </div>
+          <div id="transformed-data-output">
+              <h4>Transformed and Merged Data (Preview)</h4>
+              <div id="transformed-data-table">
+                  <!-- HTML table generated by Python will be inserted here -->
+              </div>
+          </div>
+      </div>
+
+    </div>
+
+    <div class="sidebar">
+      <h2>How It Works</h2>
+      <ol>
+        <li>
+          <strong>File Upload:</strong> You upload two files (Primary and Secondary).
+        .
+        <li>
+          <strong>Initial Standardization:</strong> Both files get basic rule-based column naming (snake_case, common map) and deduplication.
+        </li>
+        <li>
+          <strong>Primary Analysis:</strong> The columns of the *Primary File* (after initial standardization) are analyzed by Granite 3.3 to understand their content and data types.
+        </li>
+        <li>
+          <strong>Code Generation:</strong> Granite's analysis and samples from the Primary File are sent to the Gemini API, which generates a custom Python script tailored for cleaning and typing the Primary File.
+        </li>
+        <li>
+          <strong>Transformation:</strong> The generated script is safely executed on the Primary File.
+        </li>
+         <li>
+          <strong>Merging:</strong> The transformed Primary File is merged with the rule-based standardized Secondary File using column names.
+        </li>
+        <li>
+          <strong>Results Display:</strong> The column analysis and a preview of the final, unified data table are displayed in your browser.
+        </li>
+      </ol>
+    </div>
+  </div>
+
+    <footer>
+        Table-Smith Demo built with Granite 3.3, Gemini 2.5 Flash, Flask, and ngrok. For simulation purposes only.
+    </footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('upload-form');
+    const submitButton = document.getElementById('submit-button');
+    const flashContainer = document.getElementById('flash-container');
+    const primaryFileInput = document.getElementById('primary_file');
+    const secondaryFileInput = document.getElementById('secondary_file');
+    
+    // --- IMPORTANT: Update this URL every time you restart the notebook's ngrok cell ---
+    // const ngrokUrl = ' https://humane-reliably-owl.ngrok-free.app';
+    const ngrokUrl = 'https://09f8eddd28f7.ngrok-free.app';
+    // ---------------------------------------------------------------------------------
+
+    const displayFlashMessage = (message, category = 'error') => {
+      const flashDiv = document.createElement('div');
+      flashDiv.className = `flash ${category}`;
+      flashDiv.textContent = message;
+      flashContainer.innerHTML = ''; // Clear previous messages
+      flashContainer.appendChild(flashDiv);
+    };
+    
+    // This function now just clears the flash messages on the index page
+    const clearPreviousState = () => {
+        flashContainer.innerHTML = '';
+    };
+
+    form.addEventListener('submit', async (event) => {
+      // Prevent the default form submission which reloads the page
+      event.preventDefault();
+
+      clearPreviousState();
+
+      const primaryFile = primaryFileInput.files[0];
+      const secondaryFile = secondaryFileInput.files[0];
+
+      if (!primaryFile || !secondaryFile) {
+        displayFlashMessage('Please select both a Primary and a Secondary file.', 'warning');
+        return;
+      }
+
+      // Disable the button and show a processing message
+      submitButton.disabled = true;
+      submitButton.value = 'Processing... This may take a moment...';
+      displayFlashMessage(`Uploading ${primaryFile.name} and ${secondaryFile.name}. The models are now working...`, 'info');
+
+      const formData = new FormData();
+      formData.append('primary_file', primaryFile);
+      formData.append('secondary_file', secondaryFile);
+
+      if (ngrokUrl === 'YOUR_NGROK_PUBLIC_URL' || !ngrokUrl) {
+        displayFlashMessage('Configuration Error: The ngrok URL is not set in index.html. Please update the `ngrokUrl` variable.', 'error');
+        submitButton.disabled = false;
+        submitButton.value = 'Analyze and Transform Data';
+        return;
+      }
+
+      const apiUrl = `${ngrokUrl}/process_data`;
+      console.log(`Sending request to: ${apiUrl}`);
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`API Error ${response.status}: ${errorText || response.statusText}`);
+        }
+
+        // Parse the full JSON response from the server
+        const result = await response.json();
+        console.log('API Response Received:', result);
+
+        // *** KEY CHANGE: Store the result and redirect ***
+        // 1. Store the entire JSON response in sessionStorage. It's temporary and cleared when the browser tab closes.
+        sessionStorage.setItem('processingResults', JSON.stringify(result));
+        
+        // 2. Redirect the user to the results page.
+        window.location.href = 'results.html';
+
+      } catch (error) {
+        // Handle network errors or if the server response is not valid JSON
+        console.error('Fetch Error:', error);
+        displayFlashMessage(`An error occurred: ${error.message}. Check the browser console for more details. Ensure the backend server is running and the ngrok URL is correct.`, 'error');
+      } finally {
+        // Re-enable the button. If redirection happens, this won't be visible, but it's good practice for error cases.
+        submitButton.disabled = false;
+        submitButton.value = 'Analyze and Transform Data';
+      }
+    });
+
+    // Clear flash messages if the user selects a new file
+    primaryFileInput.addEventListener('change', clearPreviousState);
+    secondaryFileInput.addEventListener('change', clearPreviousState);
+  });
+</script>
+</body>
+</html>
