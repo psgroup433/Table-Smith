@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Processing Results</title>
+  <style>
+    /* --- General Body and Font Styling --- */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      background-color: #f8f9fa;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* --- Header Styling --- */
+    header {
+      background-color: #ffffff;
+      padding: 1.5rem 3rem;
+      border-bottom: 1px solid #dee2e6;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: #343a40;
+    }
+    
+    /* --- Main Container Layout --- */
+    .main-container {
+      max-width: 1400px;
+      margin: auto;
+      padding: 3rem;
+      flex: 1;
+      display: flex; /* Helps center the result box */
+      justify-content: center;
+    }
+
+    /* --- UPDATED: Result Box --- */
+    .result-box {
+      background: #ffffff;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      min-width: 800px; /* Ensures the box doesn't get too narrow on wide screens */
+    }
+    
+    h3 {
+      font-size: 1.5rem;
+      color: #343a40;
+      border-bottom: 2px solid #e9ecef;
+      padding-bottom: 0.5rem;
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+    }
+    
+    h4 {
+        font-size: 1.1rem;
+        color: #495057;
+        margin-bottom: 1rem;
+    }
+
+    /* --- Original File Preview Styling for Vertical Stacking --- */
+    .file-previews-container {
+        margin-bottom: 2.5rem;
+    }
+    .preview-box:not(:last-child) {
+        margin-bottom: 2.5rem;
+    }
+    .preview-table-wrapper {
+        max-height: 250px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+    }
+
+    /* --- Column Analysis Box Styling --- */
+    .analysis-box {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+    #column-analysis-details {
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+        white-space: pre-wrap;
+        word-break: break-all;
+        margin: 0;
+    }
+    
+    /* --- Final Preview Table Container --- */
+    #final-table-container {
+      margin-top: 1rem;
+      overflow-x: auto;
+    }
+
+    /* --- Shared Table Styling --- */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table td {
+      border: 1px solid #dee2e6;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .data-table tbody tr:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+    .data-table th {
+      background-color: #007bff;
+      color: white;
+      font-weight: 600;
+      padding: 12px 15px;
+      text-align: left;
+      border: 1px solid #0069d9;
+    }
+    
+    /* --- Download Section & Button --- */
+    .download-section { text-align: center; margin-top: 1rem; }
+    .download-link {
+      display: inline-block; background: linear-gradient(45deg, #28a745, #218838);
+      color: white; padding: 15px 30px; border: none; border-radius: 8px;
+      cursor: pointer; font-size: 1.1rem; font-weight: bold; text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .download-link:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4); }
+    .return-link { background: linear-gradient(45deg, #007bff, #0056b3); }
+    .return-link:hover { box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4); }
+    
+    /* --- Footer Styling --- */
+    footer { text-align: center; padding: 1.5rem; color: #6c757d; font-size: 0.9em; margin-top: auto; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Processing Results</h1>
+  </header>
+
+  <div class="main-container">
+    <div class="result-box">
+      
+      <!-- Original File Previews Section -->
+      <div id="file-previews-container" style="display: none;">
+          <div class="preview-box">
+              <h4>Primary File (First 5 Rows)</h4>
+              <div class="preview-table-wrapper" id="primary-file-preview"></div>
+          </div>
+          <div class="preview-box">
+              <h4>Secondary File (First 5 Rows)</h4>
+              <div class="preview-table-wrapper" id="secondary-file-preview"></div>
+          </div>
+      </div>
+      
+      <h3>Column Analysis Details</h3>
+      <div class="analysis-box">
+          <pre id="column-analysis-details">Loading analysis...</pre>
+      </div>
+
+      <h3>Transformed and Merged Data (Preview)</h3>
+      <div id="final-table-container">
+        <p>Loading final table...</p>
+      </div>
+
+      <div class="download-section" id="download-section"></div>
+    </div>
+  </div>
+
+  <footer>
+      Table-Smith Demo built with Granite 3.3, Gemini 2.5 Flash, Flask, and ngrok. For simulation purposes only.
+  </footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const resultsDataString = sessionStorage.getItem('processingResults');
+    
+    // Get references to all the elements
+    const pageTitle = document.getElementById('page-title');
+    const finalTableContainer = document.getElementById('final-table-container');
+    const downloadSection = document.getElementById('download-section');
+    const columnAnalysisDetails = document.getElementById('column-analysis-details');
+    const filePreviewsContainer = document.getElementById('file-previews-container');
+    const primaryFilePreviewContainer = document.getElementById('primary-file-preview');
+    const secondaryFilePreviewContainer = document.getElementById('secondary-file-preview');
+
+    if (!resultsDataString) {
+      pageTitle.textContent = 'Error';
+      document.querySelector('.main-container').innerHTML = `
+        <div class="result-box">
+          <div style="padding: 1rem; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 8px;">
+            <strong>No processing data found.</strong> The session may have expired.
+          </div>
+          <div class="download-section">
+            <a href="index.html" class="download-link return-link">Return to Upload Page</a>
+          </div>
+        </div>`;
+      return;
+    }
+
+    const results = JSON.parse(resultsDataString);
+    console.log("Data retrieved:", results);
+
+    // 1. Render Original File Previews
+    if (results.primary_file_preview_html || results.secondary_file_preview_html) {
+        filePreviewsContainer.style.display = 'block'; // Show the container
+        if(results.primary_file_preview_html) {
+            primaryFilePreviewContainer.innerHTML = results.primary_file_preview_html;
+            primaryFilePreviewContainer.querySelector('table')?.classList.add('data-table');
+        }
+        if(results.secondary_file_preview_html) {
+            secondaryFilePreviewContainer.innerHTML = results.secondary_file_preview_html;
+            secondaryFilePreviewContainer.querySelector('table')?.classList.add('data-table');
+        }
+    }
+
+    // 2. Render Column Analysis (new format)
+    if (results.column_analysis && results.column_analysis.length > 0) {
+      let analysisText = "";
+      results.column_analysis.forEach(item => {
+          analysisText += `- Col: '${item.original_name_for_reference || 'N/A'}'\n`;
+          analysisText += `  Canonical: '${item.suggested_canonical_name || 'N/A'}'\n`;
+          analysisText += `  Type: '${item.inferred_data_type || 'N/A'}'\n`;
+          analysisText += `  Notes: '${item.cleaning_notes || 'N/A'}'\n\n`;
+      });
+      columnAnalysisDetails.textContent = analysisText.trim();
+    } else {
+      columnAnalysisDetails.textContent = 'No column analysis was returned.';
+    }
+
+    // 3. Render Final Merged Table
+    if (results.transformed_data_preview) {
+      finalTableContainer.innerHTML = results.transformed_data_preview;
+      const injectedTable = finalTableContainer.querySelector('table');
+      if (injectedTable) {
+        injectedTable.classList.add('data-table');
+      }
+    } else {
+      finalTableContainer.innerHTML = '<p>The transformed data preview could not be displayed.</p>';
+    }
+
+    // 4. Create Download Link
+    downloadSection.innerHTML = '';
+    if (results.raw_data && results.raw_data.length > 0) {
+        const downloadButton = document.createElement('a');
+        downloadButton.className = 'download-link';
+        downloadButton.textContent = 'Download Final CSV';
+        downloadButton.href = "#";
+        downloadButton.onclick = (e) => {
+            e.preventDefault();
+            generateCsvDownload(results.raw_data);
+        };
+        downloadSection.appendChild(downloadButton);
+    } else {
+        const noDownloadMsg = document.createElement('p');
+        noDownloadMsg.innerHTML = '<strong>No data available to download.</strong>';
+        downloadSection.appendChild(noDownloadMsg);
+    }
+  });
+
+  function generateCsvDownload(data) {
+    if (!data || data.length === 0) return;
+    const headers = Object.keys(data[0]);
+    const csvRows = [headers.join(',')];
+    for (const row of data) {
+        const values = headers.map(header => {
+            const val = row[header];
+            const escaped = (val === null || val === undefined) ? '' : ('' + val).replace(/"/g, '""'); 
+            return `"${escaped}"`;
+        });
+        csvRows.push(values.join(','));
+    }
+    const csvString = csvRows.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = 'transformed_data.csv';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  }
+</script>
+
+</body>
+</html>
