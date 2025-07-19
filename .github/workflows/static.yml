@@ -1,0 +1,39 @@
+# Name of the workflow
+name: Deploy Frontend to GitHub Pages
+
+# Run this workflow every time you push to the 'main' branch
+on:
+  push:
+    branches:
+      - main
+
+# Allow this job to clone the repo and create a page deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Get the code from your repository
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Step 2: Tell Actions to build the site from the 'frontend' folder
+      - name: Build
+        run: |
+          mkdir -p _site
+          cp -r frontend/* _site
+
+      # Step 3: Upload the contents of the 'frontend' folder as an artifact
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+      # Step 4: Deploy the artifact to GitHub Pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
