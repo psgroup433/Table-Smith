@@ -6,4 +6,5 @@ torch==2.0.1
 transformers==4.33.2
 huggingface-hub==0.16.4
 google-generativeai==0.24.3
-kaggle_secrets==1.0.0
+kaggle_secrets
+
