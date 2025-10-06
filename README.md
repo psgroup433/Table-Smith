@@ -1,6 +1,6 @@
 
 # 🚀 Table-Smith  
-### 🌈 AI-Powered Tabular Data Transformation & Fusion
+### ✨ AI-Powered Tabular Data Transformation & Fusion
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen) ![License](https://img.shields.io/badge/license-Apache%202.0-blue) ![Version](https://img.shields.io/badge/version-1.0.0-orange)  
 
@@ -13,7 +13,7 @@ Designed for scalable performance, it serves multiple domains with a colorful an
 
 ---
 
-## ✨ Key Features
+## 🐱‍🏍 Key Features
 
 - Automated extraction and transformation of tabular data formats (CSV, JSON, XLSX).  
 - Multi-class classification of transformations with **Llama 3.2-3B-Instruct**.  
