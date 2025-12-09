@@ -16,7 +16,7 @@ Designed for scalable performance, it serves multiple domains with a colorful an
 ## 🐱‍🏍 Key Features
 
 - Automated extraction and transformation of tabular data formats (CSV, JSON, XLSX).  
-- Multi-class classification of transformations with **Llama 3.2-3B-Instruct**.  
+- Multi-class classification of transformations with **Granite 3.3-2B-Instruct**.  
 - Human-readable transformation notes and Python code generation using **Gemini 2.5 Flash**.  
 - User-friendly web UI supporting file uploads, data visualization, and download of results.  
 - Scalable and modular architecture tailored for real-world applications.
