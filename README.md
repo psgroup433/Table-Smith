@@ -70,7 +70,7 @@ Project Mentor: Dr. M. Deepika, NEIL GOGTE INSTITUTE OF TECHNOLOGY
 ## 📬 Contact & Contributions
 
 Contributions, issues, or feature requests are always welcome!  
-Feel free to check issues and submit pull requests.
+Feel free to check issues and submit pull requests
 
 ---
 
